@@ -22,6 +22,9 @@ var httpClient = &http.Client{Timeout: requestTimeout}
 func main() {
 	backends := config.Require("MCP_BACKENDS")
 	addr := config.Get("PORT", ":8080")
+	if len(addr) > 0 && addr[0] != ':' {
+		addr = ":" + addr
+	}
 
 	agg := newAggregator()
 	agg.initAll(backends)
