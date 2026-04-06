@@ -1,0 +1,155 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+env:
+  REGISTRY: docker.io
+  IMAGE_PREFIX: traffino/mcp
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      servers: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            brave:
+              - 'cmd/brave/**'
+              - 'internal/**'
+              - 'docker/brave.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            bunq:
+              - 'cmd/bunq/**'
+              - 'internal/**'
+              - 'docker/bunq.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            cloudflare:
+              - 'cmd/cloudflare/**'
+              - 'internal/**'
+              - 'docker/cloudflare.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            discord:
+              - 'cmd/discord/**'
+              - 'internal/**'
+              - 'docker/discord.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            docker:
+              - 'cmd/docker/**'
+              - 'internal/**'
+              - 'docker/docker.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            github:
+              - 'cmd/github/**'
+              - 'internal/**'
+              - 'docker/github.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            hetzner:
+              - 'cmd/hetzner/**'
+              - 'internal/**'
+              - 'docker/hetzner.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            ms365:
+              - 'cmd/ms365/**'
+              - 'internal/**'
+              - 'docker/ms365.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            aggregator:
+              - 'cmd/aggregator/**'
+              - 'internal/**'
+              - 'docker/aggregator.Dockerfile'
+              - 'go.mod'
+              - 'go.sum'
+            memory:
+              - 'docker/memory.Dockerfile'
+
+  build-and-push:
+    needs: changes
+    if: needs.changes.outputs.servers != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        server: ${{ fromJson(needs.changes.outputs.servers) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.server }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/${{ matrix.server }}.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-all-on-tag:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        server: [brave, bunq, cloudflare, discord, docker, github, hetzner, ms365, aggregator, memory]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.server }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/${{ matrix.server }}.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
