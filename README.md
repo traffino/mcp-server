@@ -10,16 +10,16 @@ Most MCP servers run on Node.js and consume 200-500MB RAM each. With 10+ servers
 
 | Server | API | Scope | Status |
 |--------|-----|-------|--------|
-| brave | Brave Search | Web Search + Suggest | planned |
-| memory | Knowledge Graph | Full (external) | planned |
-| hetzner | Hetzner Cloud | All resources, read-only | planned |
-| cloudflare | Cloudflare | Proxy to mcp.cloudflare.com | planned |
-| github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search | planned |
-| discord | Discord Bot | Guilds, Channels, Roles, Reactions, Threads | planned |
-| docker | Docker Engine | Full read/write | planned |
-| ms365 | Microsoft Graph | Full + Shared Mailbox | planned |
-| bunq | Bunq Banking | Accounts, Payments, Cards, Schedules (read-only) | planned |
-| aggregator | MCP Proxy | Tool aggregation across backends | planned |
+| brave | Brave Search | Web Search + Suggest | done |
+| memory | Knowledge Graph | Full (external binary) | done |
+| hetzner | Hetzner Cloud | All resources, read-only | done |
+| cloudflare | Cloudflare | Proxy to mcp.cloudflare.com | done |
+| github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search | done |
+| discord | Discord Bot | Guilds, Channels, Roles, Reactions, Threads | done |
+| docker | Docker Engine | Full read/write | done |
+| ms365 | Microsoft Graph | Full + Shared Mailbox | done |
+| bunq | Bunq Banking | Accounts, Payments, Cards, Schedules (read-only) | done |
+| aggregator | MCP Proxy | Tool aggregation across backends | done |
 
 ## Quick Start
 
