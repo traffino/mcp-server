@@ -5,99 +5,18 @@ on:
     branches: [main]
     tags: ['v*']
   workflow_dispatch:
-    inputs:
-      build_all:
-        description: 'Build all images (ignore path filter)'
-        type: boolean
-        default: true
 
 env:
   REGISTRY: docker.io
   IMAGE_PREFIX: traffino/mcp
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      servers: ${{ steps.all.outputs.servers || steps.filter.outputs.changes }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: All servers (manual/tag)
-        id: all
-        if: inputs.build_all == true || startsWith(github.ref, 'refs/tags/v')
-        run: echo 'servers=["brave","bunq","cloudflare","discord","docker","github","hetzner","ms365","aggregator","memory"]' >> "$GITHUB_OUTPUT"
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        if: steps.all.outputs.servers == ''
-        with:
-          filters: |
-            brave:
-              - 'cmd/brave/**'
-              - 'internal/**'
-              - 'docker/brave.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            bunq:
-              - 'cmd/bunq/**'
-              - 'internal/**'
-              - 'docker/bunq.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            cloudflare:
-              - 'cmd/cloudflare/**'
-              - 'internal/**'
-              - 'docker/cloudflare.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            discord:
-              - 'cmd/discord/**'
-              - 'internal/**'
-              - 'docker/discord.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            docker:
-              - 'cmd/docker/**'
-              - 'internal/**'
-              - 'docker/docker.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            github:
-              - 'cmd/github/**'
-              - 'internal/**'
-              - 'docker/github.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            hetzner:
-              - 'cmd/hetzner/**'
-              - 'internal/**'
-              - 'docker/hetzner.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            ms365:
-              - 'cmd/ms365/**'
-              - 'internal/**'
-              - 'docker/ms365.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            aggregator:
-              - 'cmd/aggregator/**'
-              - 'internal/**'
-              - 'docker/aggregator.Dockerfile'
-              - 'go.mod'
-              - 'go.sum'
-            memory:
-              - 'docker/memory.Dockerfile'
-
   build-and-push:
-    needs: changes
-    if: needs.changes.outputs.servers != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        server: ${{ fromJson(needs.changes.outputs.servers) }}
+        server: [brave, bunq, cloudflare, discord, docker, github, hetzner, ms365, aggregator, memory]
     steps:
       - uses: actions/checkout@v4
 
@@ -117,6 +36,7 @@ jobs:
             type=sha,prefix=
             type=ref,event=branch
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - uses: docker/build-push-action@v6
@@ -127,6 +47,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+          cache-from: type=gha,scope=${{ matrix.server }}
+          cache-to: type=gha,scope=${{ matrix.server }},mode=max
