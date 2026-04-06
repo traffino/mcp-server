@@ -5,7 +5,7 @@ Jeder MCP-Server bekommt ein eigenes Docker Image.
 ## Standard-Pattern (eigener Code)
 
 ```dockerfile
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -22,7 +22,7 @@ ENTRYPOINT ["/server"]
 ## Externes Binary (memory)
 
 ```dockerfile
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine AS builder
 RUN go install github.com/okooo5km/memory-mcp-server-go@latest
 
 FROM scratch
