@@ -54,6 +54,24 @@ docker run -e BRAVE_API_KEY=xxx -p 8000:8000 traffino/mcp-brave
 - **Config**: Environment variables only
 - **Base image**: `scratch` (static Go binary + CA certificates)
 
-## API Coverage
+See [docs/architecture.md](docs/architecture.md) for the full system overview, auth details, and deployment strategy.
 
-See `docs/api-coverage/` for detailed endpoint coverage per server.
+## Documentation
+
+### Architecture & Design
+
+- [Architecture Overview](docs/architecture.md) — system diagram, server types, auth per server, Docker strategy, aggregator format
+
+### API Coverage per Server
+
+Detailed endpoint tables showing which API endpoints are implemented, planned, or out-of-scope:
+
+| Server | Coverage Doc | Endpoints |
+|--------|-------------|-----------|
+| brave | [brave.md](docs/api-coverage/brave.md) | Web Search, Suggest |
+| bunq | [bunq.md](docs/api-coverage/bunq.md) | Accounts, Payments, Cards, Schedules |
+| discord | [discord.md](docs/api-coverage/discord.md) | Guilds, Channels, Roles, Reactions, Threads, Users |
+| docker | [docker.md](docs/api-coverage/docker.md) | Containers, Images, Networks, Volumes, System |
+| github | [github.md](docs/api-coverage/github.md) | Repos, Issues, PRs, Actions, Releases, Search, Users |
+| hetzner | [hetzner.md](docs/api-coverage/hetzner.md) | Servers, SSH Keys, Firewalls, Networks, Volumes, IPs, LBs, ... |
+| ms365 | [ms365.md](docs/api-coverage/ms365.md) | Mail, Calendar, Contacts, OneDrive, Teams, OneNote, To Do |
