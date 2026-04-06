@@ -50,7 +50,7 @@ make clean             # Build-Artefakte loeschen
 | hetzner | Hetzner Cloud | Alle Bereiche, readonly | MCP Server |
 | cloudflare | Cloudflare | Proxy zu mcp.cloudflare.com | HTTP Proxy |
 | github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search, Users | MCP Server |
-| discord | Discord Bot | Guilds, Channels, Roles, Reactions, Threads (r/w) | MCP Server |
+| discord | Discord Bot | Guilds, Channels, Messages, Roles, Reactions, Threads (r/w) | MCP Server |
 | docker | Docker Engine | Vollstaendig (r/w) | MCP Server |
 | ms365 | Microsoft Graph | Vollstaendig + Shared Mailbox (r/w) | MCP Server |
 | bunq | Bunq Banking | Konten, Payments, Cards, Schedules (readonly) | MCP Server |

@@ -29,10 +29,17 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "list_guild_channels", Description: "List all channels in a guild"}, makeGuildChannels(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "list_guild_members", Description: "List members of a guild"}, makeGuildMembers(token))
 
-	// Channels (read + write)
+	// Channels (read + write + delete)
 	mcp.AddTool(s, &mcp.Tool{Name: "get_channel", Description: "Get channel details by ID"}, makeGetChannel(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "create_channel", Description: "Create a new channel in a guild"}, makeCreateChannel(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "edit_channel", Description: "Edit a channel's name or topic"}, makeEditChannel(token))
+	mcp.AddTool(s, &mcp.Tool{Name: "delete_channel", Description: "Delete a channel or thread by ID (irreversible)"}, makeDeleteChannel(token))
+
+	// Messages (read + write + delete)
+	mcp.AddTool(s, &mcp.Tool{Name: "get_messages", Description: "Get messages from a channel"}, makeGetMessages(token))
+	mcp.AddTool(s, &mcp.Tool{Name: "send_message", Description: "Send a message to a channel"}, makeSendMessage(token))
+	mcp.AddTool(s, &mcp.Tool{Name: "edit_message", Description: "Edit a message sent by the bot"}, makeEditMessage(token))
+	mcp.AddTool(s, &mcp.Tool{Name: "delete_message", Description: "Delete a message by ID"}, makeDeleteMessage(token))
 
 	// Roles (read)
 	mcp.AddTool(s, &mcp.Tool{Name: "list_roles", Description: "List all roles in a guild"}, makeListRoles(token))
@@ -47,6 +54,7 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "list_archived_threads", Description: "List archived threads in a channel"}, makeListArchivedThreads(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "create_thread", Description: "Create a new thread in a channel"}, makeCreateThread(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "join_thread", Description: "Join a thread"}, makeJoinThread(token))
+	mcp.AddTool(s, &mcp.Tool{Name: "leave_thread", Description: "Leave a thread"}, makeLeaveThread(token))
 
 	// Users (read)
 	mcp.AddTool(s, &mcp.Tool{Name: "get_user", Description: "Get user info by ID"}, makeGetUser(token))
@@ -102,6 +110,30 @@ type CreateThreadParams struct {
 
 type UserID struct {
 	UserID string `json:"user_id" jsonschema:"Discord user ID"`
+}
+
+type MessageParams struct {
+	ChannelID string `json:"channel_id" jsonschema:"Channel ID"`
+	MessageID string `json:"message_id" jsonschema:"Message ID"`
+}
+
+type GetMessagesParams struct {
+	ChannelID string `json:"channel_id" jsonschema:"Channel ID"`
+	Limit     int    `json:"limit,omitempty" jsonschema:"Max messages to return, 1-100 (default 50)"`
+	Before    string `json:"before,omitempty" jsonschema:"Get messages before this message ID"`
+	After     string `json:"after,omitempty" jsonschema:"Get messages after this message ID"`
+	Around    string `json:"around,omitempty" jsonschema:"Get messages around this message ID"`
+}
+
+type SendMessageParams struct {
+	ChannelID string `json:"channel_id" jsonschema:"Channel ID"`
+	Content   string `json:"content" jsonschema:"Message content (up to 2000 characters)"`
+}
+
+type EditMessageParams struct {
+	ChannelID string `json:"channel_id" jsonschema:"Channel ID"`
+	MessageID string `json:"message_id" jsonschema:"Message ID"`
+	Content   string `json:"content" jsonschema:"New message content (up to 2000 characters)"`
 }
 
 // --- Handlers ---
@@ -274,6 +306,76 @@ func makeGetUser(token string) func(context.Context, *mcp.CallToolRequest, *User
 func makeGetCurrentUser(token string) func(context.Context, *mcp.CallToolRequest, any) (*mcp.CallToolResult, any, error) {
 	return func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
 		return discordGet(token, "/users/@me")
+	}
+}
+
+func makeDeleteChannel(token string) func(context.Context, *mcp.CallToolRequest, *ChannelID) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *ChannelID) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" {
+			return errResult("channel_id is required")
+		}
+		return discordDelete(token, fmt.Sprintf("/channels/%s", p.ChannelID))
+	}
+}
+
+func makeGetMessages(token string) func(context.Context, *mcp.CallToolRequest, *GetMessagesParams) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *GetMessagesParams) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" {
+			return errResult("channel_id is required")
+		}
+		limit := p.Limit
+		if limit <= 0 || limit > 100 {
+			limit = 50
+		}
+		path := fmt.Sprintf("/channels/%s/messages?limit=%d", p.ChannelID, limit)
+		if p.Before != "" {
+			path += "&before=" + p.Before
+		}
+		if p.After != "" {
+			path += "&after=" + p.After
+		}
+		if p.Around != "" {
+			path += "&around=" + p.Around
+		}
+		return discordGet(token, path)
+	}
+}
+
+func makeSendMessage(token string) func(context.Context, *mcp.CallToolRequest, *SendMessageParams) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *SendMessageParams) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" || p.Content == "" {
+			return errResult("channel_id and content are required")
+		}
+		body := map[string]any{"content": p.Content}
+		return discordPost(token, fmt.Sprintf("/channels/%s/messages", p.ChannelID), body)
+	}
+}
+
+func makeEditMessage(token string) func(context.Context, *mcp.CallToolRequest, *EditMessageParams) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *EditMessageParams) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" || p.MessageID == "" || p.Content == "" {
+			return errResult("channel_id, message_id, and content are required")
+		}
+		body := map[string]any{"content": p.Content}
+		return discordPatch(token, fmt.Sprintf("/channels/%s/messages/%s", p.ChannelID, p.MessageID), body)
+	}
+}
+
+func makeDeleteMessage(token string) func(context.Context, *mcp.CallToolRequest, *MessageParams) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *MessageParams) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" || p.MessageID == "" {
+			return errResult("channel_id and message_id are required")
+		}
+		return discordDelete(token, fmt.Sprintf("/channels/%s/messages/%s", p.ChannelID, p.MessageID))
+	}
+}
+
+func makeLeaveThread(token string) func(context.Context, *mcp.CallToolRequest, *ChannelID) (*mcp.CallToolResult, any, error) {
+	return func(ctx context.Context, req *mcp.CallToolRequest, p *ChannelID) (*mcp.CallToolResult, any, error) {
+		if p.ChannelID == "" {
+			return errResult("channel_id (thread ID) is required")
+		}
+		return discordDelete(token, fmt.Sprintf("/channels/%s/thread-members/@me", p.ChannelID))
 	}
 }
 
