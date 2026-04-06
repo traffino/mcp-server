@@ -38,7 +38,8 @@ mcp.AddTool(srv.MCPServer(), &mcp.Tool{
 - Parameter-Structs mit `json` und `jsonschema` Tags
 - `jsonschema` Tag ist die Beschreibung fuer den LLM-Client
 - Optional-Felder mit `omitempty`
-- Fehler als `mcp.NewError()` zurueckgeben, nicht als Go-Error (dritter Return-Wert)
+- Fehler als `result.SetError(err)` zurueckgeben (setzt IsError=true + Content mit Fehlertext)
+- Helper-Funktion `errResult(msg)` fuer einheitliches Error-Handling
 - Go-Error (dritter Return-Wert) nur fuer unerwartete/interne Fehler
 - Ergebnisse als `TextContent` mit JSON oder formatiertem Text
 - Fuer grosse Ergebnisse: JSON bevorzugen (LLM kann es gut parsen)
