@@ -37,7 +37,7 @@ make clean             # Build-Artefakte loeschen
 - Jeder MCP-Server nutzt `internal/server.New()` fuer Bootstrap
 - Port 8000 fuer MCP (Streamable HTTP auf `/mcp`), Health auf `/health`
 - Konfiguration ausschliesslich ueber Environment-Variablen
-- Docker: Multi-stage Build, `scratch` als finale Base, CGO_ENABLED=0
+- Docker: Multi-stage Build, `alpine:3.21` als finale Base, CGO_ENABLED=0
 - Keine externen Dependencies ausser dem MCP SDK und stdlib
 - Sonderfaelle: cloudflare (Proxy), aggregator (Proxy), memory (externes Binary)
 

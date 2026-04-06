@@ -62,9 +62,9 @@ All servers use **Streamable HTTP** transport:
 ## Docker Strategy
 
 Each server gets its own Docker image built from a shared pattern:
-1. `golang:1.24-alpine` builder stage
+1. `golang:1.26-alpine` builder stage
 2. `CGO_ENABLED=0` static binary
-3. `scratch` final image (~8-10MB)
+3. `alpine:3.21` final image (~13-15MB)
 
 Exception: `memory.Dockerfile` installs an external Go binary.
 
