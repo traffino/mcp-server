@@ -9,13 +9,13 @@ Client (Claude, Nanoclaw, etc.)
     │
     ▼
 ┌─────────────────────┐
-│  Aggregator (:8080)  │  MCP-to-MCP proxy, tool prefixing
+│  Aggregator (:8000)  │  MCP-to-MCP proxy, tool prefixing
 └────────┬────────────┘
          │ Streamable HTTP
     ┌────┼────┬────┬────┬────┬────┬────┬────┐
     ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼
   brave bunq cloud disc dock gith hetz ms365 memory
-  :8000 :8000 :8000 :8000 :8000 :8000 :8000 :8000 :8080
+  :8000 :8000 :8000 :8000 :8000 :8000 :8000 :8000 :8000
 ```
 
 ## Server Types
@@ -43,7 +43,7 @@ Use `internal/server/` bootstrap with `modelcontextprotocol/go-sdk`:
 All servers use **Streamable HTTP** transport:
 - MCP endpoint: `POST /mcp`
 - Health check: `GET /health`
-- Default port: `8000` (aggregator: `8080`)
+- Default port: `8000`
 
 ## Authentication per Server
 
@@ -78,4 +78,4 @@ Tools are prefixed with backend name: `brave_web_search`, `github_list_repos`, e
 
 ## Integration with infrastructure-home
 
-Replace the Node.js services in `docker-compose.yml` with the Go binaries. Each server drops from ~300MB (node:22-slim) to ~10MB (scratch).
+Replace the Node.js services in `docker-compose.yml` with the Go binaries. Each server drops from ~300MB (node:22-slim) to ~15MB (alpine).

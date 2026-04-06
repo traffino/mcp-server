@@ -6,5 +6,5 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server .
 
 FROM alpine:3.21
 COPY --from=builder /bin/server /server
-EXPOSE 8080
-ENTRYPOINT ["/server", "-t", "http"]
+EXPOSE 8000
+ENTRYPOINT ["/server", "-t", "http", "-p", "8000"]

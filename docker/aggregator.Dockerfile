@@ -7,5 +7,5 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server ./cmd/aggregator
 
 FROM alpine:3.21
 COPY --from=builder /bin/server /server
-EXPOSE 8080
+EXPOSE 8000
 ENTRYPOINT ["/server"]
