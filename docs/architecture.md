@@ -56,7 +56,7 @@ All servers use **Streamable HTTP** transport:
 | docker | `DOCKER_HOST` (optional) | Unix socket (no auth) |
 | github | `GITHUB_PERSONAL_ACCESS_TOKEN` | `Authorization: Bearer` header |
 | hetzner | `HETZNER_API_TOKEN` | `Authorization: Bearer` header |
-| ms365 | `MS365_MCP_CLIENT_ID`, `MS365_MCP_CLIENT_SECRET`, `MS365_MCP_TENANT_ID` | OAuth 2.0 client credentials |
+| ms365 | `MS365_CLIENT_ID`, `MS365_CLIENT_SECRET`, `MS365_TENANT_ID` | OAuth 2.0 client credentials |
 | aggregator | `MCP_BACKENDS` | N/A (connects to other servers) |
 
 ## Docker Strategy

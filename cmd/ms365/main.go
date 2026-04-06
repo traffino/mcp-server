@@ -21,9 +21,9 @@ const tokenURL = "https://login.microsoftonline.com/%s/oauth2/v2.0/token"
 var httpClient = &http.Client{Timeout: 30 * time.Second}
 
 func main() {
-	clientID := config.Require("MS365_MCP_CLIENT_ID")
-	clientSecret := config.Require("MS365_MCP_CLIENT_SECRET")
-	tenantID := config.Require("MS365_MCP_TENANT_ID")
+	clientID := config.Require("MS365_CLIENT_ID")
+	clientSecret := config.Require("MS365_CLIENT_SECRET")
+	tenantID := config.Require("MS365_TENANT_ID")
 
 	auth := &tokenProvider{
 		clientID: clientID, clientSecret: clientSecret, tenantID: tenantID,
