@@ -95,6 +95,7 @@ jobs:
     if: needs.changes.outputs.servers != '[]'
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         server: ${{ fromJson(needs.changes.outputs.servers) }}
     steps:
