@@ -49,6 +49,7 @@ make clean             # Build-Artefakte loeschen
 | memory | Knowledge Graph | Vollstaendig (extern) | Nur Dockerfile |
 | hetzner | Hetzner Cloud | Alle Bereiche, readonly | MCP Server |
 | cloudflare | Cloudflare | Proxy zu mcp.cloudflare.com | HTTP Proxy |
+| drawio | draw.io | Proxy zu mcp.draw.io (Diagramme, Shapes) | HTTP Proxy |
 | github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search, Users | MCP Server |
 | discord | Discord Bot | Guilds, Channels, Messages, Roles, Reactions, Threads (r/w) | MCP Server |
 | docker | Docker Engine | Vollstaendig (r/w) | MCP Server |
