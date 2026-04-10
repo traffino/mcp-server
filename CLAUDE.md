@@ -55,6 +55,7 @@ make clean             # Build-Artefakte loeschen
 | docker | Docker Engine | Vollstaendig (r/w) | MCP Server |
 | ms365 | Microsoft Graph | Vollstaendig + Shared Mailbox (r/w) | MCP Server |
 | bunq | Bunq Banking | Konten, Payments, Cards, Schedules (readonly) | MCP Server |
+| tracker | Personal Tracker | Ueberstunden, Urlaub, Kranktage (SQLite) | MCP Server |
 | aggregator | MCP Proxy | Tool-Aggregation ueber alle Backends | HTTP Proxy |
 
 ## Deployment

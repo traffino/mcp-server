@@ -2,7 +2,7 @@
 
 ## Overview
 
-Monorepo with 10 MCP servers in Go, designed as lightweight replacements for Node.js-based MCP servers.
+Monorepo with 11 MCP servers in Go, designed as lightweight replacements for Node.js-based MCP servers.
 
 ```
 Client (Claude, Nanoclaw, etc.)
@@ -29,6 +29,7 @@ Use `internal/server/` bootstrap with `modelcontextprotocol/go-sdk`:
 - **github** — GitHub REST API (readonly: repos, issues, PRs, actions, releases, search)
 - **hetzner** — Hetzner Cloud API (readonly: all resource types)
 - **ms365** — Microsoft Graph API (full r/w + shared mailbox, OAuth client credentials)
+- **tracker** — Personal Tracker (overtime, vacation, sick days per company, SQLite)
 
 ### Proxies (no MCP SDK)
 - **cloudflare** — HTTP reverse proxy to `mcp.cloudflare.com` with token injection
@@ -57,6 +58,7 @@ All servers use **Streamable HTTP** transport:
 | github | `GITHUB_PERSONAL_ACCESS_TOKEN` | `Authorization: Bearer` header |
 | hetzner | `HETZNER_API_TOKEN` | `Authorization: Bearer` header |
 | ms365 | `MS365_CLIENT_ID`, `MS365_CLIENT_SECRET`, `MS365_TENANT_ID` | OAuth 2.0 client credentials |
+| tracker | `TRACKER_DB_PATH` (optional) | N/A (local SQLite) |
 | aggregator | `MCP_BACKENDS` | N/A (connects to other servers) |
 
 ## Docker Strategy
