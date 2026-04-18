@@ -74,6 +74,20 @@
 | project_archive | id | implemented |
 | project_delete | id | implemented |
 
+### TODO
+
+| Tool | Parameter | Status |
+|------|-----------|--------|
+| todo_add | title, project?, company?, due_date?, note?, recurrence_type?, recurrence_days?, recurrence_day? | implemented |
+| subtask_add | parent_id, title, due_date?, note? | implemented |
+| todo_list | project?, company?, status?, due_before?, due_after?, include_subtasks? | implemented |
+| todo_update | id, title?, due_date?, note?, status?, project?, company?, recurrence_*?, clear_recurrence? | implemented |
+| todo_complete | id | implemented |
+| todo_delete | id | implemented |
+| todo_move | id, project?, company? | implemented |
+| todo_upcoming | days?, company? | implemented |
+| todo_overdue | company? | implemented |
+
 ## Hinweise
 
 - SQLite via `modernc.org/sqlite` (pure Go, kein CGO)
@@ -82,5 +96,9 @@
 - Company-Parameter akzeptiert Name (case-insensitive) oder ID
 - Vacation type: `vacation` (default) oder `special_leave`
 - Overtime hat zwei Typen: `work` (mit start_time/end_time, hours berechnet) und `reduction` (Abbau, hours positiv gespeichert, im Saldo negativ)
+- TODO-Hierarchie hat strikt drei Ebenen: Projekt → Todo → Subtask
+- Subtasks erben project_id/company_id implizit vom Parent
+- Rekurrenz nur auf Top-Level-TODOs; Pattern fest terminiert (naechste Instanz = Pattern-basiert, unabhaengig von Completion-Zeitpunkt)
+- `todo_list` Default-Filter: `status IN ('open','in_progress')`; `status='all'` zeigt alles
 
 *Hinweis: Phase-1-Zustand. Nach Abschluss aller Phasen wird diese Datei mit Person/Annual Event/Project/Todo-Sektionen und angepasstem Overtime-Schema erweitert.*

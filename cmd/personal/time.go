@@ -55,3 +55,7 @@ func ComputeHours(start, end string) (float64, error) {
 	hours := diff / 60.0
 	return float64(int(hours*100+0.5)) / 100.0, nil
 }
+
+func parseDateLocal(s string) (time.Time, error) {
+	return time.ParseInLocation("2006-01-02", s, appLoc)
+}

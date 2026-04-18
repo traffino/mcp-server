@@ -83,5 +83,16 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "project_archive", Description: "Archive a project (sets status='archived')"}, makeProjectArchive(db))
 	mcp.AddTool(s, &mcp.Tool{Name: "project_delete", Description: "Delete a project and cascade-delete its todos"}, makeProjectDelete(db))
 
+	// TODO
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_add", Description: "Add a top-level TODO. Can attach to project or company, set due date, note, and recurrence (weekday or monthday)."}, makeTodoAdd(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "subtask_add", Description: "Add a subtask under a top-level TODO (max 3 levels)"}, makeSubtaskAdd(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_list", Description: "List todos with filters. Default: only open/in_progress top-level todos."}, makeTodoList(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_update", Description: "Update a todo. Setting status='done' triggers completion (audit log + recurrence advance)."}, makeTodoUpdate(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_complete", Description: "Mark a todo as done. Convenience alias for todo_update with status='done'."}, makeTodoComplete(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_delete", Description: "Delete a todo (cascades to subtasks and completion history)"}, makeTodoDelete(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_move", Description: "Move a top-level todo to a different project or company"}, makeTodoMove(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_upcoming", Description: "List open/in_progress todos due in the next N days (default 7)"}, makeTodoUpcoming(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "todo_overdue", Description: "List open/in_progress todos with due_date in the past"}, makeTodoOverdue(db))
+
 	srv.ListenAndServe(config.Get("PORT", ":8000"))
 }

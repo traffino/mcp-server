@@ -83,6 +83,33 @@ func initDB(db *sql.DB) error {
 			ON project(name) WHERE company_id IS NULL;
 		CREATE INDEX IF NOT EXISTS idx_project_company_status
 			ON project(company_id, status);
+
+		CREATE TABLE IF NOT EXISTS todo (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			title TEXT NOT NULL,
+			project_id INTEGER REFERENCES project(id) ON DELETE SET NULL,
+			company_id INTEGER REFERENCES company(id) ON DELETE SET NULL,
+			parent_id INTEGER REFERENCES todo(id) ON DELETE CASCADE,
+			status TEXT NOT NULL DEFAULT 'open'
+				CHECK(status IN ('open','in_progress','waiting','done','cancelled')),
+			due_date TEXT,
+			note TEXT,
+			recurrence_pattern TEXT,
+			completed_at TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+		);
+		CREATE INDEX IF NOT EXISTS idx_todo_status_due ON todo(status, due_date);
+		CREATE INDEX IF NOT EXISTS idx_todo_project ON todo(project_id);
+		CREATE INDEX IF NOT EXISTS idx_todo_parent ON todo(parent_id);
+
+		CREATE TABLE IF NOT EXISTS todo_completion (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			todo_id INTEGER NOT NULL REFERENCES todo(id) ON DELETE CASCADE,
+			completed_at TEXT NOT NULL,
+			due_date_at_completion TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+		);
+		CREATE INDEX IF NOT EXISTS idx_todo_completion_todo ON todo_completion(todo_id, completed_at);
 	`)
 	return err
 }
