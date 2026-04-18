@@ -19,6 +19,7 @@ Most MCP servers run on Node.js and consume 200-500MB RAM each. With 10+ servers
 | docker | Docker Engine | Full read/write | done |
 | ms365 | Microsoft Graph | Full + Shared Mailbox | done |
 | bunq | Bunq Banking | Accounts, Payments, Cards, Schedules (read-only) | done |
+| personal | Local SQLite | Companies, Overtime, Vacation, Sick Days, People, Events, Projects, TODOs | done |
 | aggregator | MCP Proxy | Tool aggregation across backends | done |
 
 ## Quick Start
@@ -75,3 +76,4 @@ Detailed endpoint tables showing which API endpoints are implemented, planned, o
 | github | [github.md](docs/api-coverage/github.md) | Repos, Issues, PRs, Actions, Releases, Search, Users |
 | hetzner | [hetzner.md](docs/api-coverage/hetzner.md) | Servers, SSH Keys, Firewalls, Networks, Volumes, IPs, LBs, ... |
 | ms365 | [ms365.md](docs/api-coverage/ms365.md) | Mail, Calendar, Contacts, OneDrive, Teams, OneNote, To Do |
+| personal | [personal.md](docs/api-coverage/personal.md) | Companies, Overtime, Vacation, Sick Days, People, Annual Events, Projects, TODOs |

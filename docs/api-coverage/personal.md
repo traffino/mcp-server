@@ -1,7 +1,7 @@
-# Personal Tracker API Coverage
+# Personal MCP Server API Coverage
 
 - **API**: Local SQLite database
-- **Letzter Check**: 2026-04-10
+- **Letzter Check**: 2026-04-18
 - **Scope**: full r/w
 
 ## Tools
@@ -47,7 +47,10 @@
 ## Hinweise
 
 - SQLite via `modernc.org/sqlite` (pure Go, kein CGO)
-- DB-Pfad konfigurierbar ueber `TRACKER_DB_PATH` (default: `/data/tracker.db`)
+- DB-Pfad konfigurierbar ueber `PERSONAL_DB_PATH` (default: `/data/personal.db`)
+- Timezone ueber `PERSONAL_TZ` (IANA, default: `Europe/Berlin`)
 - Company-Parameter akzeptiert Name (case-insensitive) oder ID
 - Vacation type: `vacation` (default) oder `special_leave`
 - Overtime hours koennen negativ sein (Abbau)
+
+*Hinweis: Phase-1-Zustand. Nach Abschluss aller Phasen wird diese Datei mit Person/Annual Event/Project/Todo-Sektionen und angepasstem Overtime-Schema erweitert.*

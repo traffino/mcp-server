@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server ./cmd/tracker
+RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server ./cmd/personal
 
 FROM alpine:3.21
 COPY --from=builder /bin/server /server
