@@ -76,5 +76,12 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_delete", Description: "Delete an annual event"}, makeAnnualEventDelete(db))
 	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_upcoming", Description: "List annual events in the next N days (default 30)"}, makeAnnualEventUpcoming(db))
 
+	// Project
+	mcp.AddTool(s, &mcp.Tool{Name: "project_add", Description: "Add a new project, optionally linked to a company"}, makeProjectAdd(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "project_list", Description: "List projects (active by default); filter by company or status"}, makeProjectList(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "project_update", Description: "Update a project (name, company, status, note)"}, makeProjectUpdate(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "project_archive", Description: "Archive a project (sets status='archived')"}, makeProjectArchive(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "project_delete", Description: "Delete a project and cascade-delete its todos"}, makeProjectDelete(db))
+
 	srv.ListenAndServe(config.Get("PORT", ":8000"))
 }

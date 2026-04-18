@@ -69,6 +69,20 @@ func initDB(db *sql.DB) error {
 			UNIQUE(person_id, type)
 		);
 		CREATE INDEX IF NOT EXISTS idx_annual_event_month_day ON annual_event(substr(date, 6));
+
+		CREATE TABLE IF NOT EXISTS project (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL,
+			company_id INTEGER REFERENCES company(id) ON DELETE SET NULL,
+			status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','archived')),
+			note TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			UNIQUE(company_id, name)
+		);
+		CREATE UNIQUE INDEX IF NOT EXISTS idx_project_private_name
+			ON project(name) WHERE company_id IS NULL;
+		CREATE INDEX IF NOT EXISTS idx_project_company_status
+			ON project(company_id, status);
 	`)
 	return err
 }

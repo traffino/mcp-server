@@ -64,6 +64,16 @@
 | annual_event_delete | id | implemented |
 | annual_event_upcoming | days? (default 30) | implemented |
 
+### Project
+
+| Tool | Parameter | Status |
+|------|-----------|--------|
+| project_add | name, company?, note? | implemented |
+| project_list | company?, status? | implemented |
+| project_update | id, name?, company?, status?, note? | implemented |
+| project_archive | id | implemented |
+| project_delete | id | implemented |
+
 ## Hinweise
 
 - SQLite via `modernc.org/sqlite` (pure Go, kein CGO)
