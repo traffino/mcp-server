@@ -16,9 +16,16 @@ func initDB(db *sql.DB) error {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			company_id INTEGER NOT NULL REFERENCES company(id) ON DELETE CASCADE,
 			date TEXT NOT NULL,
-			hours REAL NOT NULL,
+			type TEXT NOT NULL CHECK(type IN ('work','reduction')),
+			start_time TEXT,
+			end_time TEXT,
+			hours REAL NOT NULL CHECK(hours > 0),
 			reason TEXT,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			CHECK (
+				(type='work'      AND start_time IS NOT NULL AND end_time IS NOT NULL) OR
+				(type='reduction' AND start_time IS NULL     AND end_time IS NULL)
+			)
 		);
 		CREATE INDEX IF NOT EXISTS idx_overtime_company_date ON overtime(company_id, date);
 

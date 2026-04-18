@@ -19,9 +19,10 @@
 
 | Tool | Parameter | Status |
 |------|-----------|--------|
-| overtime_add | company, date, hours, reason? | implemented |
-| overtime_list | company?, year?, month? | implemented |
-| overtime_update | id, date?, hours?, reason? | implemented |
+| overtime_add_work | company, date, start_time, end_time, reason? | implemented |
+| overtime_add_reduction | company, date, hours, reason? | implemented |
+| overtime_list | company?, year?, month?, type? | implemented |
+| overtime_update | id, date?, start_time?, end_time?, hours?, reason? | implemented |
 | overtime_delete | id | implemented |
 | overtime_summary | company?, year?, month? | implemented |
 
@@ -51,6 +52,6 @@
 - Timezone ueber `PERSONAL_TZ` (IANA, default: `Europe/Berlin`)
 - Company-Parameter akzeptiert Name (case-insensitive) oder ID
 - Vacation type: `vacation` (default) oder `special_leave`
-- Overtime hours koennen negativ sein (Abbau)
+- Overtime hat zwei Typen: `work` (mit start_time/end_time, hours berechnet) und `reduction` (Abbau, hours positiv gespeichert, im Saldo negativ)
 
 *Hinweis: Phase-1-Zustand. Nach Abschluss aller Phasen wird diese Datei mit Person/Annual Event/Project/Todo-Sektionen und angepasstem Overtime-Schema erweitert.*

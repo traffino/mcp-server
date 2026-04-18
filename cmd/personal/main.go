@@ -43,11 +43,12 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "company_delete", Description: "Delete a company and all its entries"}, makeCompanyDelete(db))
 
 	// Overtime
-	mcp.AddTool(s, &mcp.Tool{Name: "overtime_add", Description: "Add an overtime entry for a company"}, makeOvertimeAdd(db))
-	mcp.AddTool(s, &mcp.Tool{Name: "overtime_list", Description: "List overtime entries with optional filters"}, makeOvertimeList(db))
-	mcp.AddTool(s, &mcp.Tool{Name: "overtime_update", Description: "Update an overtime entry"}, makeOvertimeUpdate(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "overtime_add_work", Description: "Add a worked overtime entry (with start/end time). Hours computed from times."}, makeOvertimeAddWork(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "overtime_add_reduction", Description: "Add an overtime reduction (compensatory time off). Hours subtracted from balance."}, makeOvertimeAddReduction(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "overtime_list", Description: "List overtime entries with optional filters (company, year, month, type)"}, makeOvertimeList(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "overtime_update", Description: "Update an overtime entry. For 'work' entries: change times auto-recomputes hours. For 'reduction': set hours directly."}, makeOvertimeUpdate(db))
 	mcp.AddTool(s, &mcp.Tool{Name: "overtime_delete", Description: "Delete an overtime entry"}, makeOvertimeDelete(db))
-	mcp.AddTool(s, &mcp.Tool{Name: "overtime_summary", Description: "Get overtime hours summary, grouped by company and/or month"}, makeOvertimeSummary(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "overtime_summary", Description: "Get overtime hours summary (net balance), grouped by company and month"}, makeOvertimeSummary(db))
 
 	// Vacation
 	mcp.AddTool(s, &mcp.Tool{Name: "vacation_add", Description: "Add a vacation entry for a company"}, makeVacationAdd(db))
