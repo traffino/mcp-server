@@ -80,3 +80,28 @@ func resolveCompany(db *sql.DB, input string) (int64, string, error) {
 	}
 	return id, name, nil
 }
+
+// resolvePerson resolves a person by name (case-insensitive) or ID.
+func resolvePerson(db *sql.DB, input string) (int64, string, error) {
+	if id, err := strconv.ParseInt(input, 10, 64); err == nil {
+		var name string
+		err := db.QueryRow("SELECT name FROM person WHERE id = ?", id).Scan(&name)
+		if err == sql.ErrNoRows {
+			return 0, "", fmt.Errorf("person with ID %d not found", id)
+		}
+		if err != nil {
+			return 0, "", err
+		}
+		return id, name, nil
+	}
+	var id int64
+	var name string
+	err := db.QueryRow("SELECT id, name FROM person WHERE lower(name) = lower(?)", input).Scan(&id, &name)
+	if err == sql.ErrNoRows {
+		return 0, "", fmt.Errorf("person %q not found", input)
+	}
+	if err != nil {
+		return 0, "", err
+	}
+	return id, name, nil
+}

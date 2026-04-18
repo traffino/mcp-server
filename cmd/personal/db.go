@@ -51,6 +51,24 @@ func initDB(db *sql.DB) error {
 			created_at TEXT NOT NULL DEFAULT (datetime('now'))
 		);
 		CREATE INDEX IF NOT EXISTS idx_sick_day_company_year ON sick_day(company_id, start_date);
+
+		CREATE TABLE IF NOT EXISTS person (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL UNIQUE,
+			note TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+		);
+
+		CREATE TABLE IF NOT EXISTS annual_event (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			person_id INTEGER NOT NULL REFERENCES person(id) ON DELETE CASCADE,
+			type TEXT NOT NULL CHECK(type IN ('birthday','anniversary','name_day')),
+			date TEXT NOT NULL,
+			note TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			UNIQUE(person_id, type)
+		);
+		CREATE INDEX IF NOT EXISTS idx_annual_event_month_day ON annual_event(substr(date, 6));
 	`)
 	return err
 }

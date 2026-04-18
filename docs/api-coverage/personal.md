@@ -45,6 +45,25 @@
 | sick_day_update | id, start_date?, end_date?, days?, note? | implemented |
 | sick_day_delete | id | implemented |
 
+### Person
+
+| Tool | Parameter | Status |
+|------|-----------|--------|
+| person_add | name, note? | implemented |
+| person_list | search? | implemented |
+| person_update | id, name?, note? | implemented |
+| person_delete | id | implemented |
+
+### Annual Event
+
+| Tool | Parameter | Status |
+|------|-----------|--------|
+| annual_event_add | person, type, date, note? | implemented |
+| annual_event_list | person?, type?, month? | implemented |
+| annual_event_update | id, date?, note? | implemented |
+| annual_event_delete | id | implemented |
+| annual_event_upcoming | days? (default 30) | implemented |
+
 ## Hinweise
 
 - SQLite via `modernc.org/sqlite` (pure Go, kein CGO)

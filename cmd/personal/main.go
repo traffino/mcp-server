@@ -63,5 +63,18 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "sick_day_update", Description: "Update a sick day entry"}, makeSickDayUpdate(db))
 	mcp.AddTool(s, &mcp.Tool{Name: "sick_day_delete", Description: "Delete a sick day entry"}, makeSickDayDelete(db))
 
+	// Person
+	mcp.AddTool(s, &mcp.Tool{Name: "person_add", Description: "Add a new person"}, makePersonAdd(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "person_list", Description: "List people, optionally filtered by name substring"}, makePersonList(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "person_update", Description: "Update a person (name, note)"}, makePersonUpdate(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "person_delete", Description: "Delete a person and all their events"}, makePersonDelete(db))
+
+	// Annual Event
+	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_add", Description: "Add a recurring yearly event (birthday, anniversary, name_day) for a person"}, makeAnnualEventAdd(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_list", Description: "List annual events, optionally filtered by person, type, or calendar month"}, makeAnnualEventList(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_update", Description: "Update an annual event"}, makeAnnualEventUpdate(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_delete", Description: "Delete an annual event"}, makeAnnualEventDelete(db))
+	mcp.AddTool(s, &mcp.Tool{Name: "annual_event_upcoming", Description: "List annual events in the next N days (default 30)"}, makeAnnualEventUpcoming(db))
+
 	srv.ListenAndServe(config.Get("PORT", ":8000"))
 }
