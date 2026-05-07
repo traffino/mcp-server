@@ -2,3 +2,8 @@ build/
 *.exe
 .env
 .env.*
+.claude/settings.local.json
+.claude/skills/
+.claude/.cache/
+!.claude/skills/mcp-go/
+!.claude/skills/server-add/
