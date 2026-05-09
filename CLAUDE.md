@@ -39,7 +39,7 @@ make clean             # Build-Artefakte loeschen
 - Konfiguration ausschliesslich ueber Environment-Variablen
 - Docker: Multi-stage Build, `alpine:3.21` als finale Base, CGO_ENABLED=0
 - Keine externen Dependencies ausser dem MCP SDK und stdlib
-- Sonderfaelle: cloudflare (Proxy), aggregator (Proxy), memory (externes Binary)
+- Sonderfaelle: cloudflare (Proxy), aggregator (Proxy), memory (externes Binary), personal (`modernc.org/sqlite`), aws (`aws-sdk-go-v2`)
 
 ## Server-Uebersicht
 
@@ -48,6 +48,7 @@ make clean             # Build-Artefakte loeschen
 | brave | Brave Search | Web Search + Suggest (Free) | MCP Server |
 | memory | Knowledge Graph | Vollstaendig (extern) | Nur Dockerfile |
 | hetzner | Hetzner Cloud | Alle Bereiche, readonly | MCP Server |
+| aws | AWS (SDK Go v2) | EC2, S3, IAM, RDS, Lambda, Route53, CloudWatch+Logs, ECS, EKS, CloudFront, STS — readonly | MCP Server |
 | cloudflare | Cloudflare | Proxy zu mcp.cloudflare.com | HTTP Proxy |
 | drawio | draw.io | Proxy zu mcp.draw.io (Diagramme, Shapes) | HTTP Proxy |
 | github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search, Users | MCP Server |
