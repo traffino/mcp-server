@@ -6,6 +6,7 @@ COPY . .
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server ./cmd/bunq
 
 FROM alpine:3.21
+RUN apk add --no-cache tzdata
 COPY --from=builder /bin/server /server
 EXPOSE 8000
 ENTRYPOINT ["/server"]
