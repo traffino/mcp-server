@@ -13,6 +13,7 @@ Most MCP servers run on Node.js and consume 200-500MB RAM each. With 10+ servers
 | brave | Brave Search | Web Search + Suggest | done |
 | memory | Knowledge Graph | Full (external binary) | done |
 | hetzner | Hetzner Cloud | All resources, read-only | done |
+| aws | AWS (SDK Go v2) | EC2, S3, IAM, RDS, Lambda, Route53, CloudWatch (+Logs), ECS, EKS, CloudFront, STS — read-only | done |
 | cloudflare | Cloudflare | Proxy to mcp.cloudflare.com | done |
 | github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search | done |
 | discord | Discord Bot | Guilds, Channels, Roles, Reactions, Threads | done |
@@ -75,5 +76,6 @@ Detailed endpoint tables showing which API endpoints are implemented, planned, o
 | docker | [docker.md](docs/api-coverage/docker.md) | Containers, Images, Networks, Volumes, System |
 | github | [github.md](docs/api-coverage/github.md) | Repos, Issues, PRs, Actions, Releases, Search, Users |
 | hetzner | [hetzner.md](docs/api-coverage/hetzner.md) | Servers, SSH Keys, Firewalls, Networks, Volumes, IPs, LBs, ... |
+| aws | [aws.md](docs/api-coverage/aws.md) | EC2, S3, IAM, RDS, Lambda, Route53, CloudWatch+Logs, ECS, EKS, CloudFront, STS |
 | ms365 | [ms365.md](docs/api-coverage/ms365.md) | Mail, Calendar, Contacts, OneDrive, Teams, OneNote, To Do |
 | personal | [personal.md](docs/api-coverage/personal.md) | Companies, Overtime, Vacation, Sick Days, People, Annual Events, Projects, TODOs |
