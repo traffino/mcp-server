@@ -14,6 +14,7 @@ import (
 // Register adds S3 tools to the MCP server.
 func Register(srv *mcp.Server, cfg aws.Config) {
 	client := s3.NewFromConfig(cfg)
+	registerBucketSummary(srv, cfg, client)
 
 	// list_buckets
 	type ListBucketsParams struct {

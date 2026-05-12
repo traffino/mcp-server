@@ -2,7 +2,7 @@
 
 - **API**: AWS SDK for Go v2 (Service-spezifische APIs)
 - **SDK Version**: aws-sdk-go-v2 (latest stable)
-- **Letzter Check**: 2026-05-09
+- **Letzter Check**: 2026-05-12
 - **Scope**: readonly
 - **Auth**: Static IAM Access Keys (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, optional `AWS_SESSION_TOKEN`), `AWS_REGION` Pflicht. Kein SSO/Profile/IMDS-Fallback.
 
@@ -22,6 +22,7 @@
 | S3 | GetBucketLocation | get_bucket_location |
 | S3 | ListObjectsV2 | list_objects |
 | S3 | HeadObject | head_object |
+| S3 | GetMetricData (CloudWatch, per-region) | s3_bucket_summary |
 | IAM | ListUsers | list_users |
 | IAM | GetUser | get_user |
 | IAM | ListRoles | list_roles |
@@ -38,6 +39,7 @@
 | Route53 | ListResourceRecordSets | list_resource_record_sets |
 | CloudWatch | ListMetrics | list_metrics |
 | CloudWatch | GetMetricStatistics | get_metric_statistics |
+| CloudWatch | GetMetricData | get_metric_data |
 | CloudWatch | DescribeAlarms | describe_alarms |
 | CloudWatch Logs | DescribeLogGroups | describe_log_groups |
 | CloudWatch Logs | DescribeLogStreams | describe_log_streams |
@@ -53,7 +55,7 @@
 | CloudFront | ListDistributions | list_distributions |
 | CloudFront | GetDistribution | get_distribution |
 
-**Total: 42 Tools**
+**Total: 44 Tools**
 
 ## Out-of-Scope (V1)
 
@@ -66,4 +68,6 @@
 - Pagination: viele List-Tools haben `max_items`-Param (Default 100), via SDK-Paginator.
 - Time-Felder: ISO 8601 / RFC3339-Strings (z.B. `2026-05-01T00:00:00Z`).
 - ECS und EKS Tool-Namen tragen Service-Prefix (`list_ecs_clusters`/`list_eks_clusters`) wegen Kollision.
-- Region-Switching: einmalig per `AWS_REGION` Env. Multi-Region in einem Server-Lauf nicht unterstuetzt — bei Bedarf weiteren Container mit anderer Region starten.
+- Region-Switching: einmalig per `AWS_REGION` Env. Multi-Region in einem Server-Lauf nicht unterstuetzt — bei Bedarf weiteren Container mit anderer Region starten. Ausnahme: `s3_bucket_summary` erzeugt fuer jeden Bucket einen CloudWatch-Client in dessen Region, weil S3-Bucket-Metriken nur in der Bucket-Region veroeffentlicht werden.
+- `get_metric_statistics` / `get_metric_data` nehmen `dimensions: [{Name,Value}, ...]` — 1:1 an SDK-Input weitergereicht.
+- `get_metric_data` Query-IDs muessen `^[a-z][a-zA-Z0-9_]*$` matchen (AWS-Constraint), max 500 Queries pro Call.
