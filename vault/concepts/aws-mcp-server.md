@@ -64,6 +64,29 @@ EBS und VPC sind keine eigenen SDK-Pakete — Volumes/SGs/Subnets gehen via `ser
 
 `config.LoadDefaultConfig` wird NICHT genutzt (keine Profile/SSO/IMDS-Fallbacks erlaubt — wir wollen explizite Static Keys).
 
+## IAM-Permissions
+
+Der IAM-User dessen Static Keys der Server nutzt braucht zwei Policies:
+
+1. **`ViewOnlyAccess`** (AWS-managed, `arn:aws:iam::aws:policy/job-function/ViewOnlyAccess`) — deckt die List/Describe/Get-Operationen aller V1-Services ab. AWS pflegt die Policy bei neuen Services automatisch.
+
+2. **`ViewOnlyAccessExtension`** (selber erstellen, Customer-managed) — `ViewOnlyAccess` enthaelt `s3:ListAllMyBuckets`, aber **nicht** `s3:GetBucketLocation`. Ohne diesen Grant scheitert `s3_bucket_summary` (und jeder andere Per-Bucket-Region-Lookup) beim ersten Bucket mit `AccessDenied`. Policy-Body:
+
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": "s3:GetBucketLocation",
+         "Resource": "arn:aws:s3:::*"
+       }
+     ]
+   }
+   ```
+
+Beide Policies an denselben User (oder eine Group, in der der User Mitglied ist) attachen. Schreibrechte oder `s3:GetObject` werden bewusst NICHT vergeben — der Server ist read-only, V1 listet nur Object-Metadaten.
+
 ## Tool-Naming-Konvention
 
 `<verb>_<resource>` mit AWS-Verben (`list`, `describe`, `get`):

@@ -6,6 +6,26 @@
 - **Scope**: readonly
 - **Auth**: Static IAM Access Keys (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, optional `AWS_SESSION_TOKEN`), `AWS_REGION` Pflicht. Kein SSO/Profile/IMDS-Fallback.
 
+## IAM-Permissions
+
+Quelle: vault `concepts/aws-mcp-server.md` (SSoT). Dem IAM-User des Servers zwei Policies attachen:
+
+1. **`ViewOnlyAccess`** (AWS-managed, `arn:aws:iam::aws:policy/job-function/ViewOnlyAccess`) — deckt alle V1-List/Describe/Get-Operationen ab.
+2. **`ViewOnlyAccessExtension`** (selbst anlegen, Customer-managed) — `ViewOnlyAccess` enthaelt `s3:ListAllMyBuckets`, aber **nicht** `s3:GetBucketLocation`. Ohne diesen Grant scheitert `s3_bucket_summary` bzw. jeder Per-Bucket-Region-Lookup mit `AccessDenied`:
+
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": "s3:GetBucketLocation",
+         "Resource": "arn:aws:s3:::*"
+       }
+     ]
+   }
+   ```
+
 ## Tools
 
 | Service | SDK-Operation | Tool-Name |
