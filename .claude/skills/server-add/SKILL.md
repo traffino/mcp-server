@@ -38,15 +38,18 @@ Siehe Skill `mcp-go` Rule `docker-build` fuer das Standard-Pattern.
 
 ```yaml
 matrix:
-  server: [brave, bunq, cloudflare, ..., <name>, ..., memory]
+  server: [aggregator, aws, ..., <name>, ..., personal]
 ```
 
 Alphabetisch einsortieren. Ohne diesen Schritt wird kein Docker-Image gebaut und gepusht.
+
+Lokal verifizieren mit `bash scripts/verify-mcp-matrix.sh` — CI laeuft dasselbe Skript in `build.yml` und schlaegt bei Drift zwischen `cmd/`, `docker/*.Dockerfile` und der Matrix fehl. Bei rotem CI-Step zeigt die Skript-Ausgabe genau welche der drei Stellen ergaenzt werden muss.
 
 ### 4. Dokumentation (dieses Repo)
 
 - [ ] `docs/api-coverage/<name>.md` — Tools und Parameter dokumentieren
 - [ ] `CLAUDE.md` — Eintrag in der Server-Uebersicht-Tabelle
+- [ ] User-Vault `~/.claude/vault/concepts/<name>-mcp-server.md` — Konzept-Note (Endpoint, Auth, Tools, Phase-Trennung wenn relevant)
 
 ### 5. Infrastructure (traffino/infrastructure-home)
 
@@ -105,9 +108,10 @@ In `depends_on` den neuen Service hinzufuegen:
 
 ## Haeufige Fehler
 
-| Fehler | Auswirkung |
-|--------|-----------|
-| GitHub Actions Matrix vergessen | Kein Docker-Image auf Docker Hub |
-| Aggregator `depends_on` vergessen | Aggregator startet vor Backend → Tools fehlen |
-| Nur einen Aggregator aktualisiert | Server fehlt im zweiten Stack |
-| infrastructure-home CLAUDE.md vergessen | Naechste Session kennt den neuen Server nicht |
+| Fehler | Auswirkung | Guard |
+|--------|-----------|-------|
+| GitHub Actions Matrix vergessen | Kein Docker-Image auf Docker Hub | `scripts/verify-mcp-matrix.sh` in `build.yml` failed |
+| Aggregator `depends_on` vergessen | Aggregator startet vor Backend → Tools fehlen | manuell |
+| Nur einen Aggregator aktualisiert | Server fehlt im zweiten Stack | manuell |
+| infrastructure-home CLAUDE.md vergessen | Naechste Session kennt den neuen Server nicht | manuell |
+| Vault-Konzept-Note vergessen | Wissen nur im Code, nicht im SSoT (siehe `~/.claude/CLAUDE.md` Persistenz-Layer) | manuell |

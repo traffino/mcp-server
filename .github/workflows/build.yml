@@ -16,6 +16,9 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Verify MCP server matrix
+        run: bash scripts/verify-mcp-matrix.sh
+
       - name: Vet
         run: go vet ./...
 
