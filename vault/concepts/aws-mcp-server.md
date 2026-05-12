@@ -90,3 +90,7 @@ Service-Prefix bei Mehrdeutigkeit: `ec2_list_volumes` ist NICHT gewaehlt — Vol
 - Smoke-Test mit Dummy-Creds: Server bootet, `/health` antwortet `{"status":"ok","server":"aws","version":"1.0.0"}`. Live-Calls schlagen erwartungsgemaess mit InvalidClientToken fehl.
 - Docker-Image-Build: `make docker-aws` (multi-stage, alpine + ca-certificates).
 
+## CI-Hygiene
+
+Nach Merge von PR #1 fehlte `aws` in `.github/workflows/docker.yml` Matrix — kein Image auf Docker Hub. Nachgezogen in Commit `740f924` (2026-05-12) zusammen mit CI-Guard `scripts/verify-mcp-matrix.sh`, der bei Drift zwischen `cmd/aws/`, `docker/aws.Dockerfile` und der Matrix fail-hard exited. Skill `.claude/skills/server-add/SKILL.md` referenziert den Guard.
+

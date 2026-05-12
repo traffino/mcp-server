@@ -62,6 +62,10 @@ Kein API-Token, kein AWS-Account, keine IAM. Rein gefaehrlich-arm.
 - `make docker-aws-docs` baut Image ~23 MB (Alpine 3.21 + tzdata).
 - Smoke: `/health` antwortet `{"status":"ok","target":"https://knowledge-mcp.global.api.aws"}`. `initialize`-RPC liefert Upstream-Response `AWSKnowledgeMCP 1.0.0` (protocolVersion 2025-03-26).
 
+## CI-Hygiene
+
+Nach Merge von PR #2 fehlte `aws-docs` in `.github/workflows/docker.yml` Matrix — kein Image auf Docker Hub. Nachgezogen in Commit `740f924` (2026-05-12) zusammen mit CI-Guard `scripts/verify-mcp-matrix.sh`, siehe [[aws-mcp-server]] fuer Detail.
+
 ## Out-of-Scope dieser Iteration
 
 - Compose-Eintrag in `infrastructure-home` — User integriert manuell (andere Session).

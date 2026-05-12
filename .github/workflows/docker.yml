@@ -9,6 +9,8 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_PREFIX: traffino/mcp
+  # docker/* actions are still Node 20 (no v4 major yet). Opt in until they release.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build-and-push:
@@ -18,7 +20,7 @@ jobs:
       matrix:
         server: [aggregator, aws, aws-docs, brave, bunq, cloudflare, discord, docker, drawio, github, hetzner, memory, ms365, personal]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: docker/setup-buildx-action@v3
 
