@@ -6,7 +6,7 @@ COPY . .
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /bin/server ./cmd/personal
 
 FROM alpine:3.21
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache ca-certificates tzdata
 COPY --from=builder /bin/server /server
 VOLUME /data
 EXPOSE 8000
