@@ -12,6 +12,8 @@ Eigenbau Go-MCP-Server fuer AWS-Account-Zugriff. Read-only, Static IAM Keys, Ser
 
 Phase A ([[refs/user/concepts/aws-mcp-server]]) registriert den gehosteten AWS Knowledge MCP — anonymes Doku-Wissen. Dieser Server ist Phase C: Zugriff auf den eigenen AWS-Account.
 
+Phase A wird lokal ueber [[aws-docs-mcp-server]] (HTTP-Proxy, anonym) gewrapped, damit der Aggregator alle Backends einheitlich buendelt.
+
 | | Phase A (Knowledge) | Phase C (dieser Server) |
 |---|---|---|
 | Wissen | "wie geht AWS Service X" | "was lebt in MEINEM Account" |

@@ -14,6 +14,7 @@ Most MCP servers run on Node.js and consume 200-500MB RAM each. With 10+ servers
 | memory | Knowledge Graph | Full (external binary) | done |
 | hetzner | Hetzner Cloud | All resources, read-only | done |
 | aws | AWS (SDK Go v2) | EC2, S3, IAM, RDS, Lambda, Route53, CloudWatch (+Logs), ECS, EKS, CloudFront, STS — read-only | done |
+| aws-docs | AWS Knowledge MCP | Proxy to knowledge-mcp.global.api.aws (docs, what's new, regions) | done |
 | cloudflare | Cloudflare | Proxy to mcp.cloudflare.com | done |
 | github | GitHub REST | Repos, Issues, PRs, Actions, Releases, Search | done |
 | discord | Discord Bot | Guilds, Channels, Roles, Reactions, Threads | done |
@@ -77,5 +78,6 @@ Detailed endpoint tables showing which API endpoints are implemented, planned, o
 | github | [github.md](docs/api-coverage/github.md) | Repos, Issues, PRs, Actions, Releases, Search, Users |
 | hetzner | [hetzner.md](docs/api-coverage/hetzner.md) | Servers, SSH Keys, Firewalls, Networks, Volumes, IPs, LBs, ... |
 | aws | [aws.md](docs/api-coverage/aws.md) | EC2, S3, IAM, RDS, Lambda, Route53, CloudWatch+Logs, ECS, EKS, CloudFront, STS |
+| aws-docs | [aws-docs.md](docs/api-coverage/aws-docs.md) | search_documentation, read_documentation, recommend, list_regions, get_regional_availability, retrieve_skill |
 | ms365 | [ms365.md](docs/api-coverage/ms365.md) | Mail, Calendar, Contacts, OneDrive, Teams, OneNote, To Do |
 | personal | [personal.md](docs/api-coverage/personal.md) | Companies, Overtime, Vacation, Sick Days, People, Annual Events, Projects, TODOs |
