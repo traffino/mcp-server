@@ -49,8 +49,12 @@ Konsequenz: das Repo hat damit (zusammen mit `personal/` das `modernc.org/sqlite
 | `internal/aws/ecs/` | list_clusters, describe_cluster, list_services, describe_service, list_tasks | `service/ecs` |
 | `internal/aws/eks/` | list_clusters, describe_cluster, list_nodegroups | `service/eks` |
 | `internal/aws/cloudfront/` | list_distributions, get_distribution | `service/cloudfront` |
+| `internal/aws/bedrock/` | list_foundation_models, get_foundation_model, list_inference_profiles | `service/bedrock` |
+| `internal/aws/servicequotas/` | list_service_quotas, list_aws_default_service_quotas, get_service_quota | `service/servicequotas` |
 
 EBS und VPC sind keine eigenen SDK-Pakete — Volumes/SGs/Subnets gehen via `service/ec2`.
+
+`bedrock` deckt nur Foundation Models (Control Plane) ab. Bedrock Agents, Knowledge Bases und `bedrock-runtime` (Invoke) sind out-of-scope — Anthropic-Nutzung laeuft sowieso nicht ueber den MCP-Server. `bedrock` und `servicequotas` akzeptieren optionalen `region`-Param pro Tool-Call (Bedrock-Verfuegbarkeit ist regional).
 
 ## Auth + Konfiguration
 
@@ -70,7 +74,7 @@ Der IAM-User dessen Static Keys der Server nutzt braucht zwei Policies:
 
 1. **`ViewOnlyAccess`** (AWS-managed, `arn:aws:iam::aws:policy/job-function/ViewOnlyAccess`) — deckt die List/Describe/Get-Operationen aller V1-Services ab. AWS pflegt die Policy bei neuen Services automatisch.
 
-2. **`ViewOnlyAccessExtension`** (selber erstellen, Customer-managed) — `ViewOnlyAccess` enthaelt `s3:ListAllMyBuckets`, aber **nicht** `s3:GetBucketLocation`. Ohne diesen Grant scheitert `s3_bucket_summary` (und jeder andere Per-Bucket-Region-Lookup) beim ersten Bucket mit `AccessDenied`. Policy-Body:
+2. **`ViewOnlyAccessExtension`** (selber erstellen, Customer-managed) — deckt Gaps in `ViewOnlyAccess` ab. Policy-Body:
 
    ```json
    {
@@ -78,12 +82,25 @@ Der IAM-User dessen Static Keys der Server nutzt braucht zwei Policies:
      "Statement": [
        {
          "Effect": "Allow",
-         "Action": "s3:GetBucketLocation",
-         "Resource": "arn:aws:s3:::*"
+         "Action": [
+           "s3:GetBucketLocation",
+           "bedrock:ListFoundationModels",
+           "bedrock:GetFoundationModel",
+           "bedrock:ListInferenceProfiles",
+           "servicequotas:ListServiceQuotas",
+           "servicequotas:ListAWSDefaultServiceQuotas",
+           "servicequotas:GetServiceQuota"
+         ],
+         "Resource": "*"
        }
      ]
    }
    ```
+
+   Gap-Quellen:
+   - `s3:GetBucketLocation` fehlt in `ViewOnlyAccess` (sonst scheitert `s3_bucket_summary` beim ersten Bucket mit `AccessDenied`).
+   - `bedrock:*` Read-Calls sind in `ViewOnlyAccess` nicht enthalten.
+   - `servicequotas:*` Read-Calls sind ebenfalls nicht in `ViewOnlyAccess`.
 
 Beide Policies an denselben User (oder eine Group, in der der User Mitglied ist) attachen. Schreibrechte oder `s3:GetObject` werden bewusst NICHT vergeben — der Server ist read-only, V1 listet nur Object-Metadaten.
 
@@ -109,7 +126,7 @@ Service-Prefix bei Mehrdeutigkeit: `ec2_list_volumes` ist NICHT gewaehlt — Vol
 ## Build-Status (V1)
 
 - `make aws` baut sauber, Binary ~14.9MB.
-- 42 Tools registriert (1 STS + 41 Service-Tools).
+- 48 Tools registriert (1 STS + 41 Service-Tools + 3 Bedrock + 3 ServiceQuotas).
 - Smoke-Test mit Dummy-Creds: Server bootet, `/health` antwortet `{"status":"ok","server":"aws","version":"1.0.0"}`. Live-Calls schlagen erwartungsgemaess mit InvalidClientToken fehl.
 - Docker-Image-Build: `make docker-aws` (multi-stage, alpine + ca-certificates).
 
