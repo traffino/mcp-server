@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 
+	"github.com/traffino/mcp-server/internal/aws/bedrock"
 	"github.com/traffino/mcp-server/internal/aws/cloudfront"
 	"github.com/traffino/mcp-server/internal/aws/cloudwatch"
 	"github.com/traffino/mcp-server/internal/aws/cloudwatchlogs"
@@ -15,6 +16,7 @@ import (
 	"github.com/traffino/mcp-server/internal/aws/rds"
 	"github.com/traffino/mcp-server/internal/aws/route53"
 	"github.com/traffino/mcp-server/internal/aws/s3"
+	"github.com/traffino/mcp-server/internal/aws/servicequotas"
 	"github.com/traffino/mcp-server/internal/aws/sts"
 	"github.com/traffino/mcp-server/internal/config"
 	"github.com/traffino/mcp-server/internal/server"
@@ -46,6 +48,8 @@ func main() {
 	ecs.Register(s, cfg)
 	eks.Register(s, cfg)
 	cloudfront.Register(s, cfg)
+	bedrock.Register(s, cfg)
+	servicequotas.Register(s, cfg)
 
 	srv.ListenAndServe(config.Get("PORT", ":8000"))
 }
