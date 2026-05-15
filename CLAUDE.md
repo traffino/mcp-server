@@ -39,7 +39,7 @@ make clean             # Build-Artefakte loeschen
 - Konfiguration ausschliesslich ueber Environment-Variablen
 - Docker: Multi-stage Build, `alpine:3.21` als finale Base, CGO_ENABLED=0
 - Keine externen Dependencies ausser dem MCP SDK und stdlib
-- Sonderfaelle: cloudflare (Proxy), aws-docs (Proxy), drawio (Proxy), github (Proxy zu offiziellem GitHub-MCP), bitbucket (Proxy zu Atlassian Rovo MCP), aggregator (Proxy), gitea (externes Binary aus gitea.com/gitea/gitea-mcp), memory (externes Binary), personal (`modernc.org/sqlite`), aws (`aws-sdk-go-v2`)
+- Sonderfaelle: cloudflare (Proxy), aws-docs (Proxy), drawio (Proxy), github (Proxy zu offiziellem GitHub-MCP), aggregator (Proxy), memory (externes Binary), personal (`modernc.org/sqlite`), aws (`aws-sdk-go-v2`)
 
 ## Server-Uebersicht
 
@@ -53,8 +53,7 @@ make clean             # Build-Artefakte loeschen
 | cloudflare | Cloudflare | Proxy zu mcp.cloudflare.com | HTTP Proxy |
 | drawio | draw.io | Proxy zu mcp.draw.io (Diagramme, Shapes) | HTTP Proxy |
 | github | GitHub (offizieller MCP) | Proxy zu api.githubcopilot.com/mcp (Repos, Issues, PRs, Actions, Releases, Search r/w) | HTTP Proxy |
-| gitea | Gitea (offizieller MCP) | Externes Binary gitea-mcp, Streamable HTTP — Repos, Issues, PRs, Releases, Labels, Milestones (r/w) | Nur Dockerfile |
-| bitbucket | Bitbucket Cloud (Atlassian Rovo MCP) | Proxy zu mcp.atlassian.com/v1/mcp (PRs r/w, Pipelines) — Issues fehlen upstream | HTTP Proxy |
+| bitbucket | Bitbucket Cloud REST API 2.0 | Workspaces, Repos, Branches, Commits, Files, PRs r/w (create/update/review/merge/comment), Pipelines, Issues r/w | MCP Server |
 | discord | Discord Bot | Guilds, Channels, Messages, Roles, Reactions, Threads (r/w) | MCP Server |
 | docker | Docker Engine | Vollstaendig (r/w) | MCP Server |
 | ms365 | Microsoft Graph | Vollstaendig + Shared Mailbox (r/w) | MCP Server |
