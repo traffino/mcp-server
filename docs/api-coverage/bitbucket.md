@@ -1,35 +1,51 @@
-# Bitbucket MCP Proxy Coverage
+# Bitbucket Cloud MCP Coverage
 
-- **Upstream**: Atlassian Rovo MCP Server (offiziell von Atlassian)
-- **Upstream URL**: `https://mcp.atlassian.com/v1/mcp`
-- **Doku**: [Atlassian Rovo MCP — Bitbucket Cloud](https://support.atlassian.com/bitbucket-cloud/docs/interacting-with-bitbucket-via-mcp/)
-- **Transport**: Streamable HTTP (Proxy). Der alte SSE-Endpoint `/v1/sse` wird per **2026-06-30** abgeschaltet.
-- **Auth**: Scoped API Token via `ATLASSIAN_API_TOKEN` (Bearer). **Keine App Passwords** — werden Juni 2026 abgekuendigt.
-- **Tenancy**: Cloud-only (kein Data Center). Workspace: `baltasaar` (bitbucket.org/baltasaar).
-- **Letzter Check**: 2026-05-15
+- **Upstream**: Bitbucket Cloud REST API 2.0 (Eigenbau-Wrapper, kein Atlassian-MCP)
+- **Upstream URL**: `https://api.bitbucket.org/2.0`
+- **Doku**: [Bitbucket Cloud REST API](https://developer.atlassian.com/cloud/bitbucket/rest/intro/)
+- **Auth**: Scoped API Token (Bitbucket-spezifisch) als Bearer-Token via `BITBUCKET_API_TOKEN`. **Keine App Passwords** — werden Juni 2026 abgekuendigt.
+- **Tenancy**: Cloud-only. Workspace: `baltasaar` (bitbucket.org/baltasaar).
+- **Letzter Check**: 2026-05-16
 
-## Scope (via Upstream)
+## Tools (19)
 
-Bitbucket-spezifische Tool-Familie `bitbucketPullRequest*` + Pipelines.
+### Read
 
-Read: PR list/get/diff/files, PR comments, PR tasks, PR commit-status, Pipelines.
+| Tool | Endpoint |
+|---|---|
+| `get_me` | `GET /user` |
+| `list_workspaces` | `GET /workspaces` |
+| `list_repositories` | `GET /repositories/{workspace}` |
+| `get_repository` | `GET /repositories/{workspace}/{repo_slug}` |
+| `get_file_contents` | `GET /repositories/{workspace}/{repo_slug}/src/{ref}/{path}` |
+| `list_branches` | `GET /repositories/{workspace}/{repo_slug}/refs/branches` |
+| `list_commits` | `GET /repositories/{workspace}/{repo_slug}/commits` |
+| `get_commit` | `GET /repositories/{workspace}/{repo_slug}/commit/{hash}` |
+| `list_pull_requests` | `GET /repositories/{workspace}/{repo_slug}/pullrequests?state=...` |
+| `pull_request_read` | `GET /repositories/{workspace}/{repo_slug}/pullrequests/{id}` plus optional `/diff`, `/activity`, `/commits`, `/statuses` |
+| `list_pipelines` | `GET /repositories/{workspace}/{repo_slug}/pipelines/` |
+| `get_pipeline` | `GET /repositories/{workspace}/{repo_slug}/pipelines/{uuid}` + optional `/steps/` |
+| `list_issues` | `GET /repositories/{workspace}/{repo_slug}/issues` |
+| `issue_read` | `GET /repositories/{workspace}/{repo_slug}/issues/{id}` + optional `/comments` |
 
-Write:
-- `createPullRequest`, `updatePullRequest`
-- `addPullRequestComment`
-- `approvePullRequest`, `unapprovePullRequest`
-- `mergePullRequest`, `declinePullRequest`
-- `createPullRequestTask`, `updatePullRequestTask`
+### Write
 
-## Bekannte Limits
-
-- **Bitbucket-Issues fehlen komplett** — der Atlassian Rovo MCP deckt nur PRs + Pipelines fuer Bitbucket ab. Issue-Workflows muessen ueber die Web-UI laufen. Out-of-scope upstream, nicht im Monorepo loesbar.
-- **OAuth ist "on roadmap"**, noch nicht verfuegbar — API-Token-only. Im Container-Secret/Env haltbar, nie in User-Home.
-- App Passwords sind tot ab Juni 2026 — beim Setup nur Scoped API Token erstellen.
-- Admin muss API-Token-Auth in den Rovo-MCP-Settings explizit aktivieren (Atlassian-Org-Setting).
+| Tool | Operation |
+|---|---|
+| `pull_request_write` | `action=create`: `POST /pullrequests` · `action=update`: `PUT /pullrequests/{id}` |
+| `pull_request_review_write` | `action=approve|unapprove|request-changes|unrequest-changes`: `POST/DELETE /pullrequests/{id}/approve\|request-changes` · `action=decline`: `POST /pullrequests/{id}/decline` |
+| `pull_request_comment_write` | `POST /pullrequests/{id}/comments` (raw + optional inline path/line) |
+| `merge_pull_request` | `POST /pullrequests/{id}/merge` (merge_commit / squash / fast_forward) |
+| `issue_write` | `action=create`: `POST /issues` · `action=update`: `PUT /issues/{id}` · `action=comment`: `POST /issues/{id}/comments` |
 
 ## Hinweise
 
-- Session-Management via `Mcp-Session-Id` Header (wird durchgereicht).
+- **Issues** erfordern dass das Issue-Modul im Repo aktiviert ist (Repo-Settings). 404 falls deaktiviert.
+- **Pagination**: `pagelen` (max 100) und `page` (1-indexed). Default je nach Tool 25-50.
+- **BBQL** unterstuetzt fuer `q`-Parameter (z.B. `state = "OPEN" AND author.username = "x"`). Doku: Atlassian BBQL.
+- Antworten kommen als formatiertes JSON zurueck (pretty-printed). Bei `pull_request_read` mit `include=diff` als Plain-Text-Diff.
 - Tool-Praefix in Aggregator: `bitbucket_*`.
-- Rate-Limits: Atlassian Cloud-Standard, an das Token gebunden.
+
+## Vorgeschichte
+
+Erste Iteration (PR #5, 2026-05-15) war HTTP-Proxy zu `mcp.atlassian.com/v1/mcp` (Atlassian Rovo MCP). Mit statischem API-Token expose der Rovo-MCP nur zwei generische `getTeamworkGraph*`-Tools — kein PR/Repo-Toolset. Das volle Toolset verlangt OAuth-2.1+PKCE, was im Proxy-Stil nicht abbildbar ist. Daher: Eigenbau gegen die REST-API direkt.
