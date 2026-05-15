@@ -14,8 +14,8 @@ import (
 var httpClient = &http.Client{Timeout: 30 * time.Second}
 
 func main() {
-	apiToken := config.Require("GITHUB_TOKEN")
-	targetURL := config.Get("GITHUB_MCP_URL", "https://api.githubcopilot.com/mcp/")
+	apiToken := config.Require("ATLASSIAN_API_TOKEN")
+	targetURL := config.Get("BITBUCKET_MCP_URL", "https://mcp.atlassian.com/v1/mcp")
 	addr := config.Get("PORT", ":8000")
 
 	mux := http.NewServeMux()
@@ -70,7 +70,7 @@ func main() {
 		io.Copy(w, resp.Body)
 	})
 
-	log.Printf("[github-proxy] listening on %s -> %s", addr, targetURL)
+	log.Printf("[bitbucket-proxy] listening on %s -> %s", addr, targetURL)
 	log.Fatal(http.ListenAndServe(addr, mux))
 }
 

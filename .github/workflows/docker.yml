@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server: [aggregator, aws, aws-docs, brave, bunq, cloudflare, discord, docker, drawio, github, hetzner, memory, ms365, personal]
+        server: [aggregator, aws, aws-docs, bitbucket, brave, bunq, cloudflare, discord, docker, drawio, gitea, github, hetzner, memory, ms365, personal]
     steps:
       - uses: actions/checkout@v5
 

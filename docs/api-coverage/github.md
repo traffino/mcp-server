@@ -1,46 +1,30 @@
-# GitHub REST API Coverage
+# GitHub MCP Proxy Coverage
 
-- **API**: [GitHub REST API](https://docs.github.com/en/rest)
-- **API Version**: 2022-11-28
-- **Letzter Check**: 2026-04-06
-- **Scope**: readonly
+- **Upstream**: GitHub MCP Server (offiziell von GitHub, GA seit 2025-09)
+- **Upstream URL**: `https://api.githubcopilot.com/mcp/`
+- **Source**: [github/github-mcp-server](https://github.com/github/github-mcp-server)
+- **Transport**: Streamable HTTP (Proxy)
+- **Auth**: PAT (Bearer) via `GITHUB_TOKEN`. Upstream unterstuetzt zusaetzlich OAuth 2.1 + PKCE — wird vom Proxy aktuell nicht genutzt, weil der Container-Use-Case einen statischen Token braucht.
+- **Letzter Check**: 2026-05-15
 
-## Endpoints
+## Migrations-Notiz
 
-| Bereich | Endpoint | Status | Tool-Name |
-|---------|----------|--------|-----------|
-| Repos | GET /users/{user}/repos | implemented | list_repos |
-| Repos | GET /repos/{owner}/{repo} | implemented | get_repo |
-| Repos | GET /repos/{owner}/{repo}/branches | implemented | list_branches |
-| Repos | GET /repos/{owner}/{repo}/commits | implemented | list_commits |
-| Repos | GET /repos/{owner}/{repo}/contents/{path} | implemented | get_repo_content |
-| Repos | POST/PUT/DELETE | out-of-scope | - |
-| Issues | GET /repos/{owner}/{repo}/issues | implemented | list_issues |
-| Issues | GET /repos/{owner}/{repo}/issues/{number} | implemented | get_issue |
-| Issues | GET /repos/{owner}/{repo}/issues/{number}/comments | implemented | list_issue_comments |
-| Issues | POST (create/comment) | out-of-scope | - |
-| Pull Requests | GET /repos/{owner}/{repo}/pulls | implemented | list_pull_requests |
-| Pull Requests | GET /repos/{owner}/{repo}/pulls/{number} | implemented | get_pull_request |
-| Pull Requests | GET /repos/{owner}/{repo}/pulls/{number}/files | implemented | list_pr_files |
-| Pull Requests | POST (create/merge/review) | out-of-scope | - |
-| Actions | GET /repos/{owner}/{repo}/actions/runs | implemented | list_workflow_runs |
-| Actions | GET /repos/{owner}/{repo}/actions/runs/{id} | implemented | get_workflow_run |
-| Actions | POST (trigger/cancel) | out-of-scope | - |
-| Releases | GET /repos/{owner}/{repo}/releases | implemented | list_releases |
-| Releases | GET /repos/{owner}/{repo}/releases/latest | implemented | get_latest_release |
-| Releases | POST (create) | out-of-scope | - |
-| Search | GET /search/code | implemented | search_code |
-| Search | GET /search/repositories | implemented | search_repos |
-| Search | GET /search/issues | implemented | search_issues |
-| Users | GET /users/{username} | implemented | get_user |
-| Orgs | GET /orgs/{org}/members | implemented | list_org_members |
-| Notifications | GET /notifications | out-of-scope | - |
-| Gists | GET /gists | out-of-scope | - |
-| Projects | GET /projects | out-of-scope | - |
+Frueher (2026-04-06 bis 2026-05-15) lebte in `cmd/github/` ein eigener Read-only-REST-Wrapper mit 20 Tools. Ersetzt durch diesen Proxy, weil:
+
+- Neuer User-Scope erforderte Write-Operationen (Issue/PR create/edit/comment/review/merge) — im Eigenbau ~8-10 zusaetzliche Tools + OAuth/PAT-Handling.
+- Offizieller Remote-MCP deckt Read+Write seit Sept 2025 vollstaendig ab.
+- Token-Scope filtert ungewollte Tools serverseitig (kein Code-Aufwand).
+
+## Scope (via Upstream)
+
+Read: Repos, Issues, PRs, Actions, Releases, Search, Users, Orgs, Notifications, Projects, Code Search.
+Write: Issue create/edit/comment/close+reopen/labels/assignees, PR create/edit/comment/review (approve/request-changes)/merge, Releases, Labels.
+
+Genauer Tool-Katalog: siehe Upstream-README. Token-Scopes steuern Verfuegbarkeit (z.B. `repo`, `issues`, `pull_requests`).
 
 ## Hinweise
 
-- Alle schreibenden Endpoints sind out-of-scope (readonly)
-- Auth: `Authorization: Bearer` + `X-GitHub-Api-Version: 2022-11-28`
-- Pagination: `per_page` (max 100), `page`
-- State-Filter fuer Issues/PRs: `state=open|closed|all`
+- Token-Wahl: Fine-grained PAT empfohlen. Scope auf benoetigte Repos + benoetigte Permissions (Issues r/w, Pull Requests r/w, Contents r, Metadata r) eingrenzen.
+- Session-Management via `Mcp-Session-Id` Header (wird durchgereicht).
+- Rate-Limit: GitHub-Standard (5000 req/h authenticated). Upstream-MCP zaehlt gegen das Token.
+- OAuth-Flow wird vom Proxy NICHT abgewickelt — fuer Browser-OAuth muesste der Client direkt `api.githubcopilot.com/mcp/` aufrufen (an diesem Proxy vorbei).
