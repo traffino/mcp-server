@@ -49,10 +49,6 @@ func main() {
 	mcp.AddTool(s, &mcp.Tool{Name: "list_pipelines", Description: "List pipelines in a repository"}, makeListPipelines(token))
 	mcp.AddTool(s, &mcp.Tool{Name: "get_pipeline", Description: "Get pipeline details, optionally with steps"}, makeGetPipeline(token))
 
-	mcp.AddTool(s, &mcp.Tool{Name: "list_issues", Description: "List repository issues (requires Issues enabled on the repo)"}, makeListIssues(token))
-	mcp.AddTool(s, &mcp.Tool{Name: "issue_read", Description: "Get a single issue by ID, optionally with comments"}, makeIssueRead(token))
-	mcp.AddTool(s, &mcp.Tool{Name: "issue_write", Description: "Create, update or comment on an issue (action: create|update|comment)"}, makeIssueWrite(token))
-
 	srv.ListenAndServe(config.Get("PORT", ":8000"))
 }
 
@@ -174,35 +170,6 @@ type GetPipelineParams struct {
 	RepoSlug     string `json:"repo_slug" jsonschema:"Repository slug"`
 	PipelineUUID string `json:"pipeline_uuid" jsonschema:"Pipeline UUID (with or without braces)"`
 	IncludeSteps bool   `json:"include_steps,omitempty" jsonschema:"Also fetch pipeline steps"`
-}
-
-type ListIssuesParams struct {
-	Workspace string `json:"workspace" jsonschema:"Workspace slug"`
-	RepoSlug  string `json:"repo_slug" jsonschema:"Repository slug"`
-	Query     string `json:"q,omitempty" jsonschema:"BBQL query, e.g. 'state = \"open\"'"`
-	Sort      string `json:"sort,omitempty" jsonschema:"Sort field, e.g. -updated_on"`
-	PageLen   int    `json:"pagelen,omitempty" jsonschema:"Results per page (default 30)"`
-	Page      int    `json:"page,omitempty" jsonschema:"Page number (1-indexed)"`
-}
-
-type IssueReadParams struct {
-	Workspace       string `json:"workspace" jsonschema:"Workspace slug"`
-	RepoSlug        string `json:"repo_slug" jsonschema:"Repository slug"`
-	IssueID         int    `json:"issue_id" jsonschema:"Issue number"`
-	IncludeComments bool   `json:"include_comments,omitempty" jsonschema:"Also fetch comments"`
-}
-
-type IssueWriteParams struct {
-	Action    string `json:"action" jsonschema:"create, update or comment"`
-	Workspace string `json:"workspace" jsonschema:"Workspace slug"`
-	RepoSlug  string `json:"repo_slug" jsonschema:"Repository slug"`
-	IssueID   int    `json:"issue_id,omitempty" jsonschema:"Issue number (required for update/comment)"`
-	Title     string `json:"title,omitempty" jsonschema:"Issue title (required for create)"`
-	Content   string `json:"content,omitempty" jsonschema:"Issue body markdown (create/update) or comment text (comment)"`
-	Kind      string `json:"kind,omitempty" jsonschema:"bug, enhancement, proposal, task (default bug)"`
-	Priority  string `json:"priority,omitempty" jsonschema:"trivial, minor, major, critical, blocker"`
-	State     string `json:"state,omitempty" jsonschema:"new, open, resolved, on hold, invalid, duplicate, wontfix, closed"`
-	Assignee  string `json:"assignee,omitempty" jsonschema:"Assignee account ID or UUID"`
 }
 
 // --- Handlers ---
@@ -508,111 +475,6 @@ func makeGetPipeline(token string) func(context.Context, *mcp.CallToolRequest, *
 			"steps":    steps,
 		}
 		return jsonResult(out)
-	}
-}
-
-func makeListIssues(token string) func(context.Context, *mcp.CallToolRequest, *ListIssuesParams) (*mcp.CallToolResult, any, error) {
-	return func(ctx context.Context, req *mcp.CallToolRequest, p *ListIssuesParams) (*mcp.CallToolResult, any, error) {
-		if p.Workspace == "" || p.RepoSlug == "" {
-			return errResult("workspace and repo_slug are required")
-		}
-		q := url.Values{}
-		if p.Query != "" {
-			q.Set("q", p.Query)
-		}
-		if p.Sort != "" {
-			q.Set("sort", p.Sort)
-		}
-		setPagination(q, p.Page, p.PageLen, 30)
-		return bbGet(token, fmt.Sprintf("/repositories/%s/%s/issues", p.Workspace, p.RepoSlug), q)
-	}
-}
-
-func makeIssueRead(token string) func(context.Context, *mcp.CallToolRequest, *IssueReadParams) (*mcp.CallToolResult, any, error) {
-	return func(ctx context.Context, req *mcp.CallToolRequest, p *IssueReadParams) (*mcp.CallToolResult, any, error) {
-		if p.Workspace == "" || p.RepoSlug == "" || p.IssueID == 0 {
-			return errResult("workspace, repo_slug and issue_id are required")
-		}
-		base := fmt.Sprintf("/repositories/%s/%s/issues/%d", p.Workspace, p.RepoSlug, p.IssueID)
-		if !p.IncludeComments {
-			return bbGet(token, base, nil)
-		}
-		issue, err := bbGetRaw(token, base, nil)
-		if err != nil {
-			return errResult(err.Error())
-		}
-		comments, err := bbGetRaw(token, base+"/comments", nil)
-		if err != nil {
-			return errResult(err.Error())
-		}
-		out := map[string]json.RawMessage{
-			"issue":    issue,
-			"comments": comments,
-		}
-		return jsonResult(out)
-	}
-}
-
-func makeIssueWrite(token string) func(context.Context, *mcp.CallToolRequest, *IssueWriteParams) (*mcp.CallToolResult, any, error) {
-	return func(ctx context.Context, req *mcp.CallToolRequest, p *IssueWriteParams) (*mcp.CallToolResult, any, error) {
-		if p.Workspace == "" || p.RepoSlug == "" {
-			return errResult("workspace and repo_slug are required")
-		}
-		switch p.Action {
-		case "create":
-			if p.Title == "" {
-				return errResult("title is required for create")
-			}
-			body := map[string]any{"title": p.Title}
-			if p.Content != "" {
-				body["content"] = map[string]any{"raw": p.Content}
-			}
-			if p.Kind != "" {
-				body["kind"] = p.Kind
-			}
-			if p.Priority != "" {
-				body["priority"] = p.Priority
-			}
-			if p.Assignee != "" {
-				body["assignee"] = map[string]any{"account_id": p.Assignee}
-			}
-			return bbJSON(token, "POST", fmt.Sprintf("/repositories/%s/%s/issues", p.Workspace, p.RepoSlug), body)
-		case "update":
-			if p.IssueID == 0 {
-				return errResult("issue_id is required for update")
-			}
-			body := map[string]any{}
-			if p.Title != "" {
-				body["title"] = p.Title
-			}
-			if p.Content != "" {
-				body["content"] = map[string]any{"raw": p.Content}
-			}
-			if p.Kind != "" {
-				body["kind"] = p.Kind
-			}
-			if p.Priority != "" {
-				body["priority"] = p.Priority
-			}
-			if p.State != "" {
-				body["state"] = p.State
-			}
-			if p.Assignee != "" {
-				body["assignee"] = map[string]any{"account_id": p.Assignee}
-			}
-			if len(body) == 0 {
-				return errResult("update requires at least one updatable field")
-			}
-			return bbJSON(token, "PUT", fmt.Sprintf("/repositories/%s/%s/issues/%d", p.Workspace, p.RepoSlug, p.IssueID), body)
-		case "comment":
-			if p.IssueID == 0 || p.Content == "" {
-				return errResult("issue_id and content are required for comment")
-			}
-			body := map[string]any{"content": map[string]any{"raw": p.Content}}
-			return bbJSON(token, "POST", fmt.Sprintf("/repositories/%s/%s/issues/%d/comments", p.Workspace, p.RepoSlug, p.IssueID), body)
-		default:
-			return errResult("action must be create, update or comment")
-		}
 	}
 }
 
