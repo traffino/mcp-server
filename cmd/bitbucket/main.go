@@ -18,9 +18,13 @@ import (
 
 const baseURL = "https://api.bitbucket.org/2.0"
 
-var httpClient = &http.Client{Timeout: 30 * time.Second}
+var (
+	httpClient = &http.Client{Timeout: 30 * time.Second}
+	bbEmail    string
+)
 
 func main() {
+	bbEmail = config.Require("BITBUCKET_USER_EMAIL")
 	token := config.Require("BITBUCKET_API_TOKEN")
 	srv := server.New("bitbucket", "1.0.0")
 	s := srv.MCPServer()
@@ -644,7 +648,7 @@ func bbRequest(token, method, path string, query url.Values, body any) (*http.Re
 	if err != nil {
 		return nil, nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.SetBasicAuth(bbEmail, token)
 	req.Header.Set("Accept", "application/json")
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")

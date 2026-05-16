@@ -31,10 +31,10 @@ Drei Forge-MCP-Server (GitHub, Gitea, Bitbucket). Read + Write fuer Issues und P
 | Server | Env-Var | Token-Typ | Pflichtige Scopes |
 |---|---|---|---|
 | `github` | `GITHUB_TOKEN` | Fine-grained PAT empfohlen | Issues r/w, Pull Requests r/w, Contents r, Metadata r |
-| `bitbucket` | `BITBUCKET_API_TOKEN` | Bitbucket Scoped API Token (Bearer) | Repository r/w, PR r/w, Issue r/w, Pipeline r |
+| `bitbucket` | `BITBUCKET_USER_EMAIL` + `BITBUCKET_API_TOKEN` | Atlassian Scoped API Token mit Bitbucket-Scopes (HTTP Basic, Email:Token) | Repository r/w, PR r/w, Issue r/w, Pipeline r |
 | `gitea` (extern) | `GITEA_ACCESS_TOKEN` + `GITEA_HOST` | Gitea-PAT | read/write repository + issue, plus release |
 
-Bitbucket-Cloud-Scoped-API-Tokens loesen die per 2026-06 abgekuendigten App Passwords ab. Atlassian-Account-API-Tokens (`ATLASSIAN_API_TOKEN`) sind eine andere Sorte und nicht passend.
+Bitbucket-Auth ist HTTP Basic mit `email:api_token`, NICHT Bearer. Bearer wird von der Bitbucket-REST-API nur fuer Workspace/Repository/Project Access Tokens und OAuth akzeptiert — bei einem Atlassian Scoped API Token liefert die API `401 "Token is invalid, expired, or not supported for this endpoint."`. Scoped API Tokens kommen aus `id.atlassian.com/manage-profile/security/api-tokens` (Atlassian-Account-weit, Scopes pro Token konfigurierbar — Bitbucket-Scopes muessen explizit ausgewaehlt sein) und loesen die per 2026-06 abgekuendigten App Passwords ab.
 
 ## Bekannte Limits
 
@@ -51,7 +51,7 @@ Bitbucket-Cloud-Scoped-API-Tokens loesen die per 2026-06 abgekuendigten App Pass
 
 `infrastructure-home` Compose pflegt User separat:
 
-- `bitbucket`: Image `traffino/mcp-bitbucket:latest` (aus diesem Monorepo gebaut), Env `BITBUCKET_API_TOKEN`
+- `bitbucket`: Image `traffino/mcp-bitbucket:latest` (aus diesem Monorepo gebaut), Env `BITBUCKET_USER_EMAIL` + `BITBUCKET_API_TOKEN`
 - `github`: wie gehabt (Proxy, `GITHUB_TOKEN`)
 - `gitea`: direktes Image `docker.gitea.com/gitea-mcp-server` mit `command: /app/gitea-mcp -t http --port 8000`
 

@@ -3,7 +3,7 @@
 - **Upstream**: Bitbucket Cloud REST API 2.0 (Eigenbau-Wrapper, kein Atlassian-MCP)
 - **Upstream URL**: `https://api.bitbucket.org/2.0`
 - **Doku**: [Bitbucket Cloud REST API](https://developer.atlassian.com/cloud/bitbucket/rest/intro/)
-- **Auth**: Scoped API Token (Bitbucket-spezifisch) als Bearer-Token via `BITBUCKET_API_TOKEN`. **Keine App Passwords** — werden Juni 2026 abgekuendigt.
+- **Auth**: Atlassian Scoped API Token (Bitbucket-Scopes) via HTTP Basic `BITBUCKET_USER_EMAIL:BITBUCKET_API_TOKEN`. User-Identifier ist die **Atlassian-Account-E-Mail**, nicht der Bitbucket-Username. **Keine App Passwords** — werden Juni 2026 abgekuendigt. **Kein Bearer** — Bearer akzeptiert die REST-API nur fuer Workspace/Repo/Project Access Tokens und OAuth.
 - **Tenancy**: Cloud-only. Workspace: `baltasaar` (bitbucket.org/baltasaar).
 - **Letzter Check**: 2026-05-16
 
