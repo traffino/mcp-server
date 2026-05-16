@@ -53,7 +53,7 @@ make clean             # Build-Artefakte loeschen
 | cloudflare | Cloudflare | Proxy zu mcp.cloudflare.com | HTTP Proxy |
 | drawio | draw.io | Proxy zu mcp.draw.io (Diagramme, Shapes) | HTTP Proxy |
 | github | GitHub (offizieller MCP) | Proxy zu api.githubcopilot.com/mcp (Repos, Issues, PRs, Actions, Releases, Search r/w) | HTTP Proxy |
-| bitbucket | Bitbucket Cloud REST API 2.0 | Workspaces, Repos, Branches, Commits, Files, PRs r/w (create/update/review/merge/comment), Pipelines, Issues r/w | MCP Server |
+| bitbucket | Bitbucket Cloud REST API 2.0 | Workspaces, Repos, Branches, Commits, Files, PRs r/w (create/update/review/merge/comment), Pipelines | MCP Server |
 | discord | Discord Bot | Guilds, Channels, Messages, Roles, Reactions, Threads (r/w) | MCP Server |
 | docker | Docker Engine | Vollstaendig (r/w) | MCP Server |
 | ms365 | Microsoft Graph | Vollstaendig + Shared Mailbox (r/w) | MCP Server |

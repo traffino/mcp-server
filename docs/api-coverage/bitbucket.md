@@ -7,7 +7,7 @@
 - **Tenancy**: Cloud-only. Workspace: `baltasaar` (bitbucket.org/baltasaar).
 - **Letzter Check**: 2026-05-16
 
-## Tools (19)
+## Tools (16)
 
 ### Read
 
@@ -25,8 +25,6 @@
 | `pull_request_read` | `GET /repositories/{workspace}/{repo_slug}/pullrequests/{id}` plus optional `/diff`, `/activity`, `/commits`, `/statuses` |
 | `list_pipelines` | `GET /repositories/{workspace}/{repo_slug}/pipelines/` |
 | `get_pipeline` | `GET /repositories/{workspace}/{repo_slug}/pipelines/{uuid}` + optional `/steps/` |
-| `list_issues` | `GET /repositories/{workspace}/{repo_slug}/issues` |
-| `issue_read` | `GET /repositories/{workspace}/{repo_slug}/issues/{id}` + optional `/comments` |
 
 ### Write
 
@@ -36,11 +34,10 @@
 | `pull_request_review_write` | `action=approve|unapprove|request-changes|unrequest-changes`: `POST/DELETE /pullrequests/{id}/approve\|request-changes` · `action=decline`: `POST /pullrequests/{id}/decline` |
 | `pull_request_comment_write` | `POST /pullrequests/{id}/comments` (raw + optional inline path/line) |
 | `merge_pull_request` | `POST /pullrequests/{id}/merge` (merge_commit / squash / fast_forward) |
-| `issue_write` | `action=create`: `POST /issues` · `action=update`: `PUT /issues/{id}` · `action=comment`: `POST /issues/{id}/comments` |
 
 ## Hinweise
 
-- **Issues** erfordern dass das Issue-Modul im Repo aktiviert ist (Repo-Settings). 404 falls deaktiviert.
+- **Bitbucket Issues + Wiki** werden von Atlassian zum 2026-08-20 eingestellt. `list_issues`/`issue_read`/`issue_write` daher entfernt (Stand 2026-05-16). Issue-Tracking laeuft auf Jira oder externen Trackern.
 - **Pagination**: `pagelen` (max 100) und `page` (1-indexed). Default je nach Tool 25-50.
 - **BBQL** unterstuetzt fuer `q`-Parameter (z.B. `state = "OPEN" AND author.username = "x"`). Doku: Atlassian BBQL.
 - Antworten kommen als formatiertes JSON zurueck (pretty-printed). Bei `pull_request_read` mit `include=diff` als Plain-Text-Diff.
